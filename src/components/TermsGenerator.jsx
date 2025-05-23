@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Download, Mail, Shield, Globe, Building, Users, Database, Cog } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Copy, Check, Mail, Shield, Globe, Building, Users, Database, Cog } from 'lucide-react';
 
 const TermsGenerator = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -171,18 +171,219 @@ DISCLAIMER: This document is for informational purposes only and does not consti
     return lines.slice(0, 15).join('\n') + '\n\n[Document continues...]';
   };
 
-  const downloadPDF = () => {
-    // Create a simple text file download (in a real app, you'd use jsPDF)
-    const content = generateDocument();
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${formData.businessName || 'Business'}_Terms_and_Conditions.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const generateHTMLDocument = () => {
+    const hasGDPR = formData.targetUsers.includes('European Union (GDPR)');
+    const hasCCPA = formData.targetUsers.includes('California (CCPA)');
+    const hasIndianIT = formData.targetUsers.includes('India (IT Act)');
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - ${formData.businessName || '[Business Name]'}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #1e40af;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 15px;
+        }
+        .business-info {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .compliance-section {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .disclaimer {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 30px 0;
+            font-size: 14px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background: #dbeafe;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TERMS AND CONDITIONS</h1>
+        
+        <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+
+        <h2>1. ACCEPTANCE OF TERMS</h2>
+        <p>By accessing and using <span class="highlight">${formData.businessName || '[Business Name]'}</span> website (<a href="${formData.websiteUrl || '#'}">${formData.websiteUrl || '[Website URL]'}</a>), you accept and agree to be bound by the terms and provision of this agreement.</p>
+
+        <h2>2. BUSINESS INFORMATION</h2>
+        <div class="business-info">
+            <p><strong>Company:</strong> ${formData.businessName || '[Business Name]'}</p>
+            <p><strong>Website:</strong> <a href="${formData.websiteUrl || '#'}">${formData.websiteUrl || '[Website URL]'}</a></p>
+            <p><strong>Location:</strong> ${formData.state ? `${formData.state}, ` : ''}${formData.country || '[Country]'}</p>
+            <p><strong>Business Type:</strong> ${formData.productType || '[Product/Service Type]'}</p>
+        </div>
+
+        <h2>3. PRODUCTS AND SERVICES</h2>
+        <p>We provide <span class="highlight">${formData.productType?.toLowerCase() || 'products and services'}</span> through our platform. All products and services are subject to availability and may be modified or discontinued without notice.</p>
+
+        <h2>4. USER ACCOUNTS</h2>
+        <p>To access certain features, you may need to create an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.</p>
+
+        <h2>5. DATA COLLECTION AND PRIVACY</h2>
+        <p><strong>We collect the following types of data:</strong></p>
+        <ul>
+            ${formData.dataCollected.map(item => `<li>${item}</li>`).join('')}
+        </ul>
+
+        <p><strong>Third-party services we use:</strong></p>
+        <ul>
+            ${formData.thirdPartyServices.map(service => `<li>${service}</li>`).join('')}
+        </ul>
+
+        ${hasGDPR ? `
+        <div class="compliance-section">
+            <h2>6. GDPR COMPLIANCE (EU Users)</h2>
+            <p>If you are located in the European Union, you have the following rights under GDPR:</p>
+            <ul>
+                <li>Right to access your personal data</li>
+                <li>Right to rectification of inaccurate data</li>
+                <li>Right to erasure ("right to be forgotten")</li>
+                <li>Right to restrict processing</li>
+                <li>Right to data portability</li>
+                <li>Right to object to processing</li>
+                <li>Rights related to automated decision-making</li>
+            </ul>
+            <p>To exercise these rights, contact us at <strong>[contact email]</strong>.</p>
+        </div>
+        ` : ''}
+
+        ${hasCCPA ? `
+        <div class="compliance-section">
+            <h2>7. CCPA COMPLIANCE (California Users)</h2>
+            <p>California residents have the right to:</p>
+            <ul>
+                <li>Know what personal information is collected</li>
+                <li>Know whether personal information is sold or disclosed</li>
+                <li>Say no to the sale of personal information</li>
+                <li>Access personal information</li>
+                <li>Equal service and pricing</li>
+            </ul>
+            <p>To exercise these rights, contact us at <strong>[contact email]</strong>.</p>
+        </div>
+        ` : ''}
+
+        ${hasIndianIT ? `
+        <div class="compliance-section">
+            <h2>8. INDIAN IT ACT COMPLIANCE</h2>
+            <p>In accordance with India's Information Technology Act, 2000:</p>
+            <ul>
+                <li>We implement reasonable security practices</li>
+                <li>We notify users of data breaches as required</li>
+                <li>We comply with data localization requirements where applicable</li>
+                <li>We maintain proper records of data processing activities</li>
+            </ul>
+        </div>
+        ` : ''}
+
+        <h2>9. PROHIBITED USES</h2>
+        <p>You may not use our service:</p>
+        <ul>
+            <li>For any unlawful purpose or to solicit others to perform illegal acts</li>
+            <li>To violate any international, federal, provincial, or state regulations, rules, laws, or local ordinances</li>
+            <li>To infringe upon or violate our intellectual property rights or the intellectual property rights of others</li>
+            <li>To harass, abuse, insult, harm, defame, slander, disparage, intimidate, or discriminate</li>
+            <li>To submit false or misleading information</li>
+        </ul>
+
+        <h2>10. INTELLECTUAL PROPERTY</h2>
+        <p>The service and its original content, features, and functionality are and will remain the exclusive property of <span class="highlight">${formData.businessName || '[Business Name]'}</span> and its licensors.</p>
+
+        <h2>11. TERMINATION</h2>
+        <p>We may terminate or suspend your account and bar access to the service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever.</p>
+
+        <h2>12. LIMITATION OF LIABILITY</h2>
+        <p>In no event shall <span class="highlight">${formData.businessName || '[Business Name]'}</span>, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages.</p>
+
+        <h2>13. GOVERNING LAW</h2>
+        <p>These terms shall be governed by and construed in accordance with the laws of <span class="highlight">${formData.country || '[Country]'}</span>, without regard to its conflict of law provisions.</p>
+
+        <h2>14. CHANGES TO TERMS</h2>
+        <p>We reserve the right, at our sole discretion, to modify or replace these terms at any time. If a revision is material, we will provide at least 30 days notice prior to any new terms taking effect.</p>
+
+        <h2>15. CONTACT INFORMATION</h2>
+        <p>If you have any questions about these Terms and Conditions, please contact us at:</p>
+        <ul>
+            <li><strong>Email:</strong> [contact email]</li>
+            <li><strong>Address:</strong> [business address]</li>
+        </ul>
+
+        <div class="disclaimer">
+            <p><strong>DISCLAIMER:</strong> This document is for informational purposes only and does not constitute legal advice. Please consult with a qualified attorney for legal advice specific to your situation.</p>
+        </div>
+    </div>
+</body>
+</html>`;
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      const htmlContent = generateHTMLDocument();
+      await navigator.clipboard.writeText(htmlContent);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 3000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = generateHTMLDocument();
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 3000);
+    }
   };
 
   if (showEmailGate && !showFullDocument) {
@@ -194,6 +395,7 @@ DISCLAIMER: This document is for informational purposes only and does not consti
               <Shield className="w-16 h-16 text-indigo-600 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Terms & Conditions are Ready!</h2>
               <p className="text-gray-600">Enter your email to unlock the full document</p>
+              
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 mb-8 relative">
@@ -240,20 +442,48 @@ DISCLAIMER: This document is for informational purposes only and does not consti
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">Your Custom Terms & Conditions</h2>
-              <button
-                onClick={downloadPDF}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                <Download className="w-5 h-5" />
-                Download
-              </button>
+              <h2 className="text-3xl font-bold text-gray-900">Terms & Conditions of {formData.businessName || '[Business Name]'}</h2>
+              <div className="flex gap-3">
+                <button
+                  onClick={copyToClipboard}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 ${
+                    copySuccess 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
+                >
+                  {copySuccess ? (
+                    <>
+                      <Check className="w-5 h-5" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-5 h-5" />
+                      Copy as HTML
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 max-h-[600px] overflow-y-scroll">
-              <pre className="text-sm text-gray-800 font-mono whitespace-pre-wrap">
-                {generateDocument()}
-              </pre>
+              <div 
+                className="prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ 
+                  __html: generateHTMLDocument().match(/<body[^>]*>(.*?)<\/body>/s)?.[1] || generateDocument() 
+                }}
+              />
+            </div>
+
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2">How to use your HTML Terms & Conditions:</h3>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Click "Copy as HTML" to copy the complete HTML document</li>
+                <li>• Paste directly into your website or CMS</li>
+                <li>• The HTML includes professional styling and responsive design</li>
+                <li>• Replace placeholder text like [contact email] with your actual details</li>
+              </ul>
             </div>
 
             <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
