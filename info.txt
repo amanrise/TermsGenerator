@@ -1,0 +1,66 @@
+setup react:
+npm create vite@latest portfolio
+cd porfolio
+npm run dev
+
+
+
+
+my-portfolio/
+├── public/
+│   └── assets/            # Static images (profile, icons, etc.)
+│
+├── src/
+│   ├── assets/            # Imported images/icons/logos used in components
+│   ├── components/        # Reusable components (Navbar, Footer, Cards)
+│   ├── pages/             # Page-level components (Home, About, Projects, Contact)
+│   ├── sections/          # Sections of pages (Hero, Skills, etc.)
+│   ├── data/              # Data files (projects, skills, etc. in JS/JSON)
+│   ├── App.jsx            # Main component that renders routes or layout
+│   ├── main.jsx           # Entry point
+│   ├── index.css          # Tailwind CSS import
+│   └── tailwind.css       # Optional, separate Tailwind styles
+│
+├── tailwind.config.js     # Tailwind setup
+├── postcss.config.js      # PostCSS setup
+├── vite.config.js         # Vite config
+├── package.json           # Dependencies
+└── README.md              # Info about the project
+
+
+
+//********************** Planning **********************//
+1. Navbar (Component)
+Contains links to: Home, About, Projects, Contact
+
+Responsive (burger menu on small screens if needed)
+
+Tailwind makes this easy to style
+
+2. Home (Page)
+Often includes a Hero Section (name, role, photo, tagline)
+
+Quick overview of what you do
+
+3. HeroSection (Section Component)
+This sits inside the Home.jsx page
+
+Focus on grabbing attention (your photo, title, brief intro)
+
+4. About (Page)
+Short bio
+
+Education, interests, soft skills
+
+5. Projects (Page)
+Show 2–3 projects
+
+Use a reusable ProjectCard component
+
+6. Contact (Page)
+Add a form or simple contact info
+
+Include social links (GitHub, LinkedIn)
+
+7. Footer (Component)
+Include at the bottom of every page
