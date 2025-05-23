@@ -156,8 +156,10 @@ We reserve the right, at our sole discretion, to modify or replace these terms a
 15. CONTACT INFORMATION
 
 If you have any questions about these Terms and Conditions, please contact us at:
+
 Email: [contact email]
-Address: [business address]
+Address: [address]
+
 
 ---
 
@@ -354,8 +356,8 @@ DISCLAIMER: This document is for informational purposes only and does not consti
         <h2>15. CONTACT INFORMATION</h2>
         <p>If you have any questions about these Terms and Conditions, please contact us at:</p>
         <ul>
-            <li><strong>Email:</strong> [contact email]</li>
-            <li><strong>Address:</strong> [business address]</li>
+            <li><strong>Email:</strong>  ${formData.userEmail}</li> 
+            <li><strong>Address:</strong>  ${formData.country || '[Country]'}</li>
         </ul>
 
         <div class="disclaimer">
@@ -442,7 +444,7 @@ DISCLAIMER: This document is for informational purposes only and does not consti
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">Terms & Conditions of {formData.businessName || '[Business Name]'}</h2>
+              <h2 className="text-3xl font-bold text-gray-900">Terms & Conditions for {formData.businessName || '[Business Name]'}</h2>
               <div className="flex gap-3">
                 <button
                   onClick={copyToClipboard}
